@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <!--  This file has been downloaded from https://bootdey.com  -->
+    <!--  All snippets are MIT license https://bootdey.com/license -->
+    <title>Bootdey.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+    	body{margin-top:20px;}
+    	.form-control {
+    padding: .6rem .8rem !important;
+    border: 2px solid #ced4da !important;
+    transition: none !important;
+}
+select.form-control{
+    height: auto !important;
+    padding: .6rem .8rem calc(.6rem + 1px) .8rem !important;
+}
+    </style>
+    <style>
+      .outer {
+        text-align: center;
+        border: 1px solid blue;
+      }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('index') }}">DRIVER</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_anonymous %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+<hr>
+<div class="container bootstrap snippet">
+    <div class="row">
+        <div class="col-sm-10">
+            <h1>{{user.username}}</h1></div>
+        <div class="col-sm-2">
+            <a href="/users" class="pull-right"><img title="profile image" class="img-circle img-responsive" src="https://bootdey.com/img/Content/avatar/avatar1.png"></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+            <!--left col-->
+
+            <ul class="list-group">
+                <li class="list-group-item text-muted">Профиль</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong>Имя</strong></span>{{user.namedriver}} {{user.surname}}</li>
+                 {% if user.datebirth %}
+                <li class="list-group-item text-right"><span class="pull-left"><strong>Дата рождения</strong></span>{{user.datebirth}}</li>
+                 {% endif %}
+
+
+
+            </ul>
+
+            <ul class="list-group">
+                <li class="list-group-item text-muted">Сводка <i class="fa fa-dashboard fa-1x"></i></li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong>Всего водителей</strong></span>{{drivers|length}}</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong>Всего заказов</strong></span>{{orders|length}}</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong>ВЫПОЛНЕННЫХ заказов</strong></span>{{succedOrder}}</li>
+                <li class="list-group-item text-right"><span class="pull-left"><strong>Заказов в работе</strong></span> {{inWorkOrder}}</li>
+            </ul>
+
+        </div>
+        <!--/col-3-->
+        <div class="col-sm-9">
+
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="active"><a href="#drivers" data-toggle="tab">Водители</a></li>
+                <li><a href="#orders" data-toggle="tab">Заказы</a></li>
+                <li><a href="#settings" data-toggle="tab">Настройки</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="drivers">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Имя водителя</th>
+                                    <th>Username</th>
+                                    <th>Машина</th>
+                                    <th>Стаж </th>
+                                    <th>Дата рождения </th>
+                                    <th>Ссылка </th>
+                                </tr>
+                            </thead>
+                            <tbody id="items">
+                                {% for driver in drivers %}
+                                <tr>
+                                    <td>{{driver.name}}</td>
+                                    <td>{{driver.username}}</td>
+                                    <td>{{driver.car_model}} {{driver.car_number}}</td>
+                                    <td>{{driver.experiense}}</td>
+                                    <td>{{driver.datebirth}}</td>
+                                    <td><a href="{{ url_for('user', username=driver.username) }}">Тык</a></p></td>
+                                </tr>
+                                {% endfor %}
+
+
+                            </tbody>
+                        </table>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4 col-md-offset-4 text-center">
+                                <ul class="pagination" id="myPager"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/table-resp-->
+
+                    <hr>
+
+                </div>
+
+                <!--/tab-pane-->
+                <div class="tab-pane" id="settings">
+
+                    <hr>
+                    <form class="form" method="POST" id="registrationForm">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="first_name">
+                                    <h4>Имя</h4></label>
+                                <input type="text" class="form-control" name="name" id="first_name" placeholder="Имя" value="{{request.form.name}}" required >
+                                {% for error in form.name.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="last_name">
+                                    <h4>Фамилия</h4></label>
+                                <input type="text" class="form-control" name="surname" id="last_name" placeholder="Фамилия" value="{{request.form.surname}}" required>
+                                {% for error in form.surname.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="date_birth">
+                                    <h4>Дата рождения</h4></label>
+                                <input type="text" class="form-control" name="datebirth" id="date_birth" placeholder="ДД.ММ.ГГГГ" value="{{request.form.datebirth}}" required>
+                                {% for error in form.datebirth.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="username">
+                                    <h4>Username</h4></label>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="username" value="{{request.form.username}}">
+                                 {% for error in form.username.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="password">
+                                    <h4>Пароль</h4></label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Пароль" value="{{request.form.password}}" required>
+                                {% for error in form.password.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-xs-6">
+                                <label for="password2">
+                                    <h4>Пароль еще раз</h4></label>
+                                <input type="password" class="form-control" name="password2" id="password2" placeholder="Пароль еще раз"  value="{{request.form.password2}}" required>
+                                {% for error in form.password2.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <br>
+                                <button class="btn btn-lg btn-success" type="submit" name = "submit"><i class="glyphicon glyphicon-ok-sign"></i> Save</button>
+                                <button class="btn btn-lg" type="reset"><i class="glyphicon glyphicon-repeat"></i> Reset</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="tab-pane" id="orders">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Клиент</th>
+                                    <th>Товар</th>
+                                    <th>Вес</th>
+                                    <th>Водитель</th>
+                                    <th>Город отправления</th>
+                                    <th>Город доставки</th>
+                                    <th>Дата доставки</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders2">
+                                {% for order in orders %}
+                                <tr>
+                                    <td>{{order.num}}</td>
+                                    <td>{{order.client}}</td>
+                                    <td>{{order.product}} </td>
+                                    <td>{{order.weight}}</td>
+                                    <td><a href="{{ url_for('user', username=order.driver_name) }}">{{order.driver_name}}</a></p></td>
+                                    <td>{{order.point_A}}</td>
+                                    <td>{{order.point_B}}</td>
+                                    <td>{{order.date_delivery}}</td>
+                                    <td>{{order.is_delivery}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                                <form class="form" method="POST" id="AddOrderForm">
+                                {{ form2.hidden_tag() }}
+                                    <div class="form-group">
+                                        <div class="col-xs-3">
+                                            <label for="first_name">
+                                            <h4>Клиент</h4></label>
+                                            <a href="#myModal" data-toggle="modal">(Добавить)</a>
+                                            <select class="form-control" name="client" id="client">
+                                                {% for client in clients %}
+                                                <option>{{client}}</option>
+                                                 {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-2">
+                                            <label for="last_name">
+                                            <h4>Товар</h4></label>
+                                            <input type="text" class="form-control" name="product" id="product" placeholder="Товар"  required>
+                                              {% for error in form2.product.errors %}
+                                              <span style="color: red;">[{{ error }}]</span>
+                                             {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-2">
+                                            <label for="last_name">
+                                            <h4>Вес</h4></label>
+                                            <input type="text" class="form-control" name="weight" id="weight" placeholder="Вес товара"  required>
+                                             {% for error in form2.weight.errors %}
+                                              <span style="color: red;">[{{ error }}]</span>
+                                             {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-2">
+                                            <label for="last_name">
+                                            <h4>Водитель</h4></label>
+                                            <select class="form-control" name="driver" id="driver">
+                                                {% for driver in drivers %}
+                                                <option>{{driver.username}}</option>
+                                                 {% endfor %}
+                                            </select>
+                                            <!--<input type="text" class="form-control" name="driver" id="driver" placeholder="Водитель" required>-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-3">
+                                            <label for="last_name">
+                                            <h4>Статус</h4></label>
+                                            <!--<input type="text" class="form-control" name="status" id="status" placeholder="Статус" required>-->
+                                            <select class="form-control" name="status" id="status">
+                                                <option>Доставлен</option>
+                                                <option>Не доставлен</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-4">
+                                            <label for="last_name">
+                                            <h4>Город отправления</h4></label>
+                                            <input type="text" class="form-control" name="city_A" id="city_A" placeholder="Город отпр"  required>
+                                              {% for error in form2.city_A.errors %}
+                                              <span style="color: red;">[{{ error }}]</span>
+                                             {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-4">
+                                            <label for="last_name">
+                                            <h4>Город доставки</h4></label>
+                                            <input type="text" class="form-control" name="city_B" id="city_B" placeholder="Город дост" required>
+                                            {% for error in form2.city_B.errors %}
+                                              <span style="color: red;">[{{ error }}]</span>
+                                             {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-4">
+                                            <label for="last_name">
+                                            <h4>Дата доставки</h4></label>
+                                            <input type="text" class="form-control" name="date_delivery" id="dateDelivery" placeholder="Date" class="textbox-n" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" id="date" required>
+                                             {% for error in form2.date_delivery.errors %}
+                                              <span style="color: red;">[{{ error }}]</span>
+                                             {% endfor %}
+                                        </div>
+                                    </div>
+                                    <br><br><br><br><br><br><br><br><br>
+                        <center><button class="btn btn-lg btn-success" type="submit" name = "addOrder">Добавить заказ</button></center>
+                                </form>
+
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4 col-md-offset-4 text-center">
+                                <ul class="pagination" id="myPager"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--/tab-pane-->
+        </div>
+        <!--/tab-content-->
+
+    </div>
+    <!--/col-9-->
+</div>
+<!--/row-->
+
+<div id="myModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Заголовок модального окна -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Добавление нового клиента</h4>
+      </div>
+      <!-- Основное содержимое модального окна -->
+      <div class="modal-body">
+        <form class="form" method="POST" id="addClient">
+              {{ form3.hidden_tag() }}
+                                    <div class="form-group">
+                                        <div class="col-xs-4">
+                                            <label for="first_name">
+                                            <h4>Имя клиента</h4></label>
+                                            <input type="text" class="form-control" name="client_name" id="client_name" placeholder="Клиент" required >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-4">
+                                            <label for="last_name">
+                                            <h4>Телефон</h4></label>
+                                            <input type="text" class="form-control" name="client_telephone" id="client_telephone" placeholder="Телефон"  required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-4">
+                                            <label for="last_name">
+                                            <h4>Номер счета</h4></label>
+                                            <input type="text" class="form-control" name="client_card" id="client_card" placeholder="Номер счета"  required>
+                                        </div>
+                                    </div>
+
+
+           <br><br><br>
+
+      <!-- Футер модального окна -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" >Закрыть</button>
+        <button class="btn btn-primary" type="submit" id = "reset">Сохранить изменения </button>
+      </div>
+        </form>
+          </div>
+    </div>
+  </div>
+</div>
+
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    document.getElementById('first_name').value = "{{user.namedriver}}";
+    document.getElementById('last_name').value = "{{user.surname}}";
+    document.getElementById('date_birth').value = "{{user.datebirth}}";
+    document.getElementById('username').value = "{{user.username}}";
+
+
+document.getElementById('reset').onclick = function() {
+    document.location.reload(true);
+}
+</script>
+
+
+</body>
+</html>
